@@ -1,0 +1,21 @@
+* {
+  box-sizing: border-box;
+
+  user-select: none;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+
+  background: #aaa;
+}
+
+a,
+a:active,
+a:link,
+a:focus,
+a:hover,
+a:visited {
+  color: inherit;
+}
