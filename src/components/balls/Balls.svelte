@@ -30,7 +30,7 @@
     light.position.set(5, 5, 5).normalize();
     scene.add(light);
     const ambientLight = new THREE.AmbientLight(0x404040, 1); // Soft white light
-    
+
     scene.add(ambientLight);
     // Add a grid helper
     const gridHelper = new THREE.GridHelper(10, 10);
@@ -42,18 +42,16 @@
 
     camera.position.z = 5;
 
-    console.log("data", data);
+    const material = new THREE.MeshStandardMaterial({
+      color: 0xf8dc5d,
+      emissive: 0xf8dc5d,
+      emissiveIntensity: 0.5,
+    });
 
     data.forEach((d) => {
-      console.log("d fr each", d);
-
       const geometry = new THREE.SphereGeometry(0.1, 32, 32);
       // const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-      const material = new THREE.MeshStandardMaterial({
-        color: 0x00ff00,
-        emissive: 0x00ff00,
-        emissiveIntensity: 0.5,
-      });
+
       const sphere = new THREE.Mesh(geometry, material);
 
       // Scale the sphere

@@ -11,6 +11,10 @@
 
   let container = null;
 
+  export let data = [];
+
+  let portfolioData = data;
+
   onMount(async () => {
     let data = await getGeoData();
 
@@ -18,7 +22,7 @@
       .scaleSequential(d3.interpolateBlues)
       .domain([0, 1])
       .range(["#fff", "#000"]);
-      // .range(["#fff", "#f8dc5d"]);
+    // .range(["#fff", "#f8dc5d"]);
 
     let codes = await fetch("/geo/codes.csv")
       .then((response) => response.text())
@@ -145,7 +149,7 @@
     const satelliteGeometry = new THREE.SphereGeometry(0.03, 32, 32);
     const satelliteMaterial = new THREE.MeshBasicMaterial({ color: 0xf8dc5d });
 
-    let orbits = new Array(100).fill(0).map((d, i) => {
+    let orbits = new Array(portfolioData.length).fill(0).map((d, i) => {
       let orbit = new THREE.EllipseCurve(
         0,
         0,
@@ -188,7 +192,9 @@
       const satellite = new THREE.Mesh(satelliteGeometry, satelliteMaterial);
 
       // Set random scale
-      let scale = Math.random() * 2 + 0.5;
+      // let scale = Math.random() * 2 + 0.5;
+      let scale = portfolioData[index]["Position Weight"] * 100;
+
       satellite.scale.set(scale, scale, scale);
 
       // Add satellite along the orbit, use the orbit points

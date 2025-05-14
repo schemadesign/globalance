@@ -59,11 +59,10 @@
 
 <svelte:window bind:innerWidth={width} bind:innerHeight={height} />
 
-<!-- {#if data.length}
-  <Balls {data}/>
-{/if} -->
-
-<Globe />
+{#if data.length}
+  <!-- <Balls {data}/> -->
+  <Globe {data} />
+{/if}
 
 <!-- <div class="app">
   {#each sections as section}
