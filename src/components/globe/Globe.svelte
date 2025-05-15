@@ -158,15 +158,28 @@
     let particleMaterial = new THREE.MeshBasicMaterial({ color: 0xf8dc5d });
     let particleMesh = new THREE.Mesh(particleGeometry, particleMaterial);
 
-    let particles = new Array(10_000).fill(0).map((d, i) => {
-      let sphere = particleMesh.clone();
+    // Use InstancedMesh for particles
+    const particleCount = 10_000;
 
-      sphere.position.copy(randomPointOnSphere(1.025));
+    const instancedParticles = new THREE.InstancedMesh(
+      particleGeometry,
+      particleMaterial,
+      particleCount
+    );
 
-      group.add(sphere);
+    // Store target positions for each particle
+    let particleTargets = [];
 
-      return sphere;
-    });
+    for (let i = 0; i < particleCount; i++) {
+      const pos = randomPointOnSphere(1.025);
+      const matrix = new THREE.Matrix4().setPosition(pos);
+
+      instancedParticles.setMatrixAt(i, matrix);
+
+      particleTargets.push(pos);
+    }
+
+    group.add(instancedParticles);
 
     function animate() {
       requestAnimationFrame(animate);
@@ -190,33 +203,35 @@
         satellite.position.z = 0; // Set z to 0 to keep it on the orbit plane
       });
 
-      particles.forEach((particle) => {
+      // Animate instanced particles towards their closest random point on the sphere
+      for (let i = 0; i < particleCount; i++) {
+        let pos = particleTargets[i];
+
         let closestPoint = randomPoints.reduce((prev, curr) => {
-          return prev.distanceTo(particle.position) <
-            curr.distanceTo(particle.position)
-            ? prev
-            : curr;
+          return prev.distanceTo(pos) < curr.distanceTo(pos) ? prev : curr;
         });
 
-        let direction = closestPoint.clone().sub(particle.position).normalize();
+        let direction = closestPoint.clone().sub(pos).normalize();
 
         // If you are closer than 0.01 to the point, stop moving and move to a new random point
-        if (particle.position.distanceTo(closestPoint) < 0.01) {
-          particle.position.copy(randomPointOnSphere(1));
+        if (pos.distanceTo(closestPoint) < 0.01) {
+          pos = randomPointOnSphere(1.025);
+          particleTargets[i] = pos;
         } else {
-          // Move the particle towards the closest point
-          // particle.position.add(direction.multiplyScalar(0.001));
-
           // Move the particle towards the closest point but stay on the sphere
-          let newPosition = particle.position
-            .clone()
-            .add(direction.multiplyScalar(0.001));
-
+          let newPosition = pos.clone().add(direction.multiplyScalar(0.001));
           let newDirection = newPosition.clone().normalize();
           let newPoint = newDirection.multiplyScalar(1.025);
-          particle.position.copy(newPoint);
+          pos = newPoint;
+          particleTargets[i] = pos;
         }
-      });
+
+        // Update the matrix for this instance
+        const matrix = new THREE.Matrix4().setPosition(pos);
+        instancedParticles.setMatrixAt(i, matrix);
+      }
+
+      instancedParticles.instanceMatrix.needsUpdate = true;
     }
 
     animate();
