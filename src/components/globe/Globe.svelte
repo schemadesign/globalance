@@ -154,7 +154,7 @@
     });
 
     // Add random particles that animate towards the closest point on the sphere
-    let particleGeometry = new THREE.SphereGeometry(0.01, 2, 2);
+    let particleGeometry = new THREE.SphereGeometry(0.005, 16, 16);
     let particleMaterial = new THREE.MeshBasicMaterial({ color: 0xf8dc5d });
     let particleMesh = new THREE.Mesh(particleGeometry, particleMaterial);
 
@@ -205,7 +205,16 @@
           particle.position.copy(randomPointOnSphere(1));
         } else {
           // Move the particle towards the closest point
-          particle.position.add(direction.multiplyScalar(0.001));
+          // particle.position.add(direction.multiplyScalar(0.001));
+
+          // Move the particle towards the closest point but stay on the sphere
+          let newPosition = particle.position
+            .clone()
+            .add(direction.multiplyScalar(0.001));
+
+          let newDirection = newPosition.clone().normalize();
+          let newPoint = newDirection.multiplyScalar(1.025);
+          particle.position.copy(newPoint);
         }
       });
     }

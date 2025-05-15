@@ -8,9 +8,9 @@ export async function createBaseMap() {
   let data = await getGeoData();
 
   const colorScale = d3
-    .scaleSequential(d3.interpolateBlues)
-    .domain([0, 1])
-    .range(["#fff", "#000"]);
+    .scaleLinear()
+    .domain([0, 0.5])
+    .range(["#8CB2B9", "#4A4886"]);
 
   let codes = await fetch("/geo/codes.csv")
     .then((response) => response.text())
@@ -105,7 +105,7 @@ export async function createBaseMap() {
 
   const material = new THREE.MeshBasicMaterial({
     map: texture,
-	transparent: true,
+    transparent: true,
   });
 
   const sphere = new THREE.Mesh(geometry, material);
