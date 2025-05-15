@@ -11,7 +11,6 @@ export async function createBaseMap() {
     .scaleSequential(d3.interpolateBlues)
     .domain([0, 1])
     .range(["#fff", "#000"]);
-  // .range(["#fff", "#f8dc5d"]);
 
   let codes = await fetch("/geo/codes.csv")
     .then((response) => response.text())
@@ -65,8 +64,8 @@ export async function createBaseMap() {
 
   // Draw map
   context.clearRect(0, 0, canvasWidth, canvasHeight);
-  context.fillStyle = "#fff";
-  context.fillRect(0, 0, canvasWidth, canvasHeight);
+  // context.fillStyle = "#fff";
+  // context.fillRect(0, 0, canvasWidth, canvasHeight);
   context.beginPath();
 
   const path = d3.geoPath(null, context).projection(projection);
@@ -106,6 +105,7 @@ export async function createBaseMap() {
 
   const material = new THREE.MeshBasicMaterial({
     map: texture,
+	transparent: true,
   });
 
   const sphere = new THREE.Mesh(geometry, material);

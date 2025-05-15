@@ -18,50 +18,6 @@
   let portfolioData = data;
 
   onMount(async () => {
-    /*
-    let data = await getGeoData();
-
-    const colorScale = d3
-      .scaleSequential(d3.interpolateBlues)
-      .domain([0, 1])
-      .range(["#fff", "#000"]);
-    // .range(["#fff", "#f8dc5d"]);
-
-    let codes = await fetch("/geo/codes.csv")
-      .then((response) => response.text())
-      .then((data) => {
-        return d3.csvParse(data, d3.autoType);
-      })
-      .then((data) => {
-        return data.reduce((acc, d) => {
-          acc[d.numeric] = d;
-
-          return acc;
-        }, {});
-      });
-
-    let features = await fetch("./geo/countries-50m.json")
-      .then((response) => response.json())
-      .then((data) => {
-        return topojson.feature(data, data.objects.countries).features;
-      })
-      .then((features) => {
-        return features.map((feature) => {
-          let code = codes[feature.id];
-
-          if (code) {
-            feature.properties = {
-              ...feature.properties,
-              ...code,
-            };
-          }
-
-          return feature;
-        });
-      });
-
-    */
-
     const width = window.innerWidth;
     const height = window.innerHeight;
 
@@ -87,83 +43,7 @@
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
     scene.add(ambientLight);
 
-    // Canvas chloropleth
-    // Size of map
-    /*
-    const canvasWidth = 1024 * 16;
-    const canvasHeight = canvasWidth / 2;
-
-    console.log("canvas size", canvasWidth, canvasHeight);
-
-    const projection = d3
-      .geoEquirectangular()
-      .translate([canvasWidth / 2, canvasHeight / 2])
-      .scale(canvasWidth / 2 / Math.PI);
-
-    // Create canvas
-    const canvas = document.createElement("canvas");
-
-    canvas.width = canvasWidth;
-    canvas.height = canvasHeight;
-    const context = canvas.getContext("2d");
-
-    // Draw map
-    context.clearRect(0, 0, canvasWidth, canvasHeight);
-    context.fillStyle = "#fff";
-    context.fillRect(0, 0, canvasWidth, canvasHeight);
-    context.beginPath();
-
-    const path = d3.geoPath(null, context).projection(projection);
-
-    features.forEach((feature) => {
-      let id = feature.properties.two;
-
-      context.beginPath();
-
-      path(feature);
-
-      let dataPoint = data[id];
-
-      if (dataPoint) {
-        context.fillStyle = colorScale(dataPoint["footprint"]);
-      } else {
-        context.fillStyle = "white";
-      }
-
-      // context.fillStyle = "black";
-      context.fill();
-
-      context.lineWidth = 4;
-      context.strokeStyle = "#fff";
-      context.stroke();
-      context.closePath();
-    });
-
-    */
-
-    // End of chloropleth
-
-    // Create texture from canvas
-    /*
-    const texture = new THREE.CanvasTexture(canvas);
-
-    // https://stackoverflow.com/questions/45376919/texture-on-sphere-fuzzy-after-version-upgrade
-    texture.minFilter = THREE.NearestFilter;
-
-    const geometry = new THREE.SphereGeometry(1, 64, 64);
-    // const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-
-    const material = new THREE.MeshBasicMaterial({
-      map: texture,
-    });
-
-    const sphere = new THREE.Mesh(geometry, material);
-    sphere.rotation.x = Math.PI / 4;
-    */
-
     const sphere = await createBaseMap();
-
-    // Let group
     const group = new THREE.Group();
     group.add(sphere);
 
@@ -244,7 +124,7 @@
 
       satellites.push(satellite);
 
-      orbitGroup.add(satellite);
+      // orbitGroup.add(satellite);
     });
 
     let randomPointOnSphere = (radius) => {
@@ -257,12 +137,12 @@
       return new THREE.Vector3(x, y, z);
     };
 
-    let randomPoints = new Array(100).fill(0).map((d, i) => {
-      return randomPointOnSphere(1);
+    let randomPoints = new Array(10).fill(0).map((d, i) => {
+      return randomPointOnSphere(1.025);
     });
 
-    let pointGeometry = new THREE.SphereGeometry(0.05, 32, 32);
-    let pointMaterial = new THREE.MeshBasicMaterial({ color: 0xf8dc5d });
+    let pointGeometry = new THREE.SphereGeometry(0.02, 32, 32);
+    let pointMaterial = new THREE.MeshBasicMaterial({ color: 0x333333 });
     let pointMesh = new THREE.Mesh(pointGeometry, pointMaterial);
 
     // Add random points to the sphere
@@ -271,6 +151,21 @@
       sphere.position.copy(point);
 
       group.add(sphere);
+    });
+
+    // Add random particles that animate towards the closest point on the sphere
+    let particleGeometry = new THREE.SphereGeometry(0.01, 2, 2);
+    let particleMaterial = new THREE.MeshBasicMaterial({ color: 0xf8dc5d });
+    let particleMesh = new THREE.Mesh(particleGeometry, particleMaterial);
+
+    let particles = new Array(10_000).fill(0).map((d, i) => {
+      let sphere = particleMesh.clone();
+
+      sphere.position.copy(randomPointOnSphere(1.025));
+
+      group.add(sphere);
+
+      return sphere;
     });
 
     function animate() {
@@ -293,6 +188,25 @@
 
         satellite.position.copy(point);
         satellite.position.z = 0; // Set z to 0 to keep it on the orbit plane
+      });
+
+      particles.forEach((particle) => {
+        let closestPoint = randomPoints.reduce((prev, curr) => {
+          return prev.distanceTo(particle.position) <
+            curr.distanceTo(particle.position)
+            ? prev
+            : curr;
+        });
+
+        let direction = closestPoint.clone().sub(particle.position).normalize();
+
+        // If you are closer than 0.01 to the point, stop moving and move to a new random point
+        if (particle.position.distanceTo(closestPoint) < 0.01) {
+          particle.position.copy(randomPointOnSphere(1));
+        } else {
+          // Move the particle towards the closest point
+          particle.position.add(direction.multiplyScalar(0.001));
+        }
       });
     }
 
