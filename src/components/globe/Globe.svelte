@@ -9,6 +9,8 @@
 
   import { getGeoData } from "../../data/getData.js";
 
+  import { createBaseMap } from "./baseMap.js";
+
   let container = null;
 
   export let data = [];
@@ -16,6 +18,7 @@
   let portfolioData = data;
 
   onMount(async () => {
+    /*
     let data = await getGeoData();
 
     const colorScale = d3
@@ -57,6 +60,8 @@
         });
       });
 
+    */
+
     const width = window.innerWidth;
     const height = window.innerHeight;
 
@@ -74,7 +79,17 @@
 
     camera.position.z = 5;
 
+    // Add a light
+    const light = new THREE.DirectionalLight(0xffffff, 1);
+    light.position.set(0, 0, 5).normalize();
+    scene.add(light);
+
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+    scene.add(ambientLight);
+
+    // Canvas chloropleth
     // Size of map
+    /*
     const canvasWidth = 1024 * 16;
     const canvasHeight = canvasWidth / 2;
 
@@ -124,8 +139,14 @@
       context.closePath();
     });
 
+    */
+
+    // End of chloropleth
+
     // Create texture from canvas
+    /*
     const texture = new THREE.CanvasTexture(canvas);
+
     // https://stackoverflow.com/questions/45376919/texture-on-sphere-fuzzy-after-version-upgrade
     texture.minFilter = THREE.NearestFilter;
 
@@ -138,6 +159,9 @@
 
     const sphere = new THREE.Mesh(geometry, material);
     sphere.rotation.x = Math.PI / 4;
+    */
+
+    const sphere = await createBaseMap();
 
     // Let group
     const group = new THREE.Group();
@@ -147,7 +171,15 @@
 
     // Add orbits and satellites
     const satelliteGeometry = new THREE.SphereGeometry(0.03, 32, 32);
-    const satelliteMaterial = new THREE.MeshBasicMaterial({ color: 0xf8dc5d });
+    // const satelliteMaterial = new THREE.MeshBasicMaterial({ color: 0xf8dc5d });
+
+    const satelliteMaterial = new THREE.MeshStandardMaterial({
+      color: 0xf8dc5d,
+      emissive: 0xf8dc5d,
+      emissiveIntensity: 0.5,
+      // transparent: true,
+      opacity: 1,
+    });
 
     let orbits = new Array(portfolioData.length).fill(0).map((d, i) => {
       let orbit = new THREE.EllipseCurve(
@@ -215,12 +247,41 @@
       orbitGroup.add(satellite);
     });
 
+    let randomPointOnSphere = (radius) => {
+      const theta = Math.random() * Math.PI * 2;
+      const phi = Math.acos(2 * Math.random() - 1); // Uniform distribution
+
+      const x = radius * Math.sin(phi) * Math.cos(theta);
+      const y = radius * Math.sin(phi) * Math.sin(theta);
+      const z = radius * Math.cos(phi);
+      return new THREE.Vector3(x, y, z);
+    };
+
+    let randomPoints = new Array(100).fill(0).map((d, i) => {
+      return randomPointOnSphere(1);
+    });
+
+    let pointGeometry = new THREE.SphereGeometry(0.05, 32, 32);
+    let pointMaterial = new THREE.MeshBasicMaterial({ color: 0xf8dc5d });
+    let pointMesh = new THREE.Mesh(pointGeometry, pointMaterial);
+
+    // Add random points to the sphere
+    randomPoints.forEach((point) => {
+      let sphere = pointMesh.clone();
+      sphere.position.copy(point);
+
+      group.add(sphere);
+    });
+
     function animate() {
       requestAnimationFrame(animate);
       controls.update();
       renderer.render(scene, camera);
 
       group.rotation.y += 0.001;
+
+      // Update canvas texture
+      // texture.needsUpdate = true;
 
       satellites.forEach((satellite, index) => {
         let orbit = orbits[index % orbits.length];
