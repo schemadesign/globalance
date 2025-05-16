@@ -3,28 +3,33 @@
 
   import * as d3 from "d3";
 
-  import Balls from "./components/balls/Balls.svelte";
+  // Small multiples
   import Bubbles from "./components/bubbles/Bubbles.svelte";
-
+  import Multiples from "./components/bubbles/Multiples.svelte";
+  // Flat map
   import Map from "./components/map/Map.svelte";
+
+  // Three
+  import Balls from "./components/balls/Balls.svelte";
   import Globe from "./components/globe/Globe.svelte";
 
   let components = [
     {
-      name: "Bubbles",
-      component: Bubbles,
+      name: "Globe",
+      component: Globe,
+    },
+    {
+      name: "Scatter",
+      component: Balls,
     },
   ];
 
-  let data = [];
+  let selectedComponent = components[0];
 
-  let yDimensions = [];
-  let xDimensions = [];
+  let data = [];
 
   let width = window.innerWidth;
   let height = window.innerHeight;
-
-  let sections = [];
 
   onMount(async () => {
     data = await fetch("./data/portfolio.csv")
@@ -32,94 +37,56 @@
       .then((text) => {
         return d3.csvParse(text, d3.autoType);
       });
-
-    sections = ["Footprint", "Megatrend"].map((section) => {
-      return {
-        name: section,
-        columns: data.columns
-          .filter((column) => {
-            return column.includes(section);
-          })
-          .map((column) => {
-            let label = column.replace(section, "").trim();
-
-            if (label.match(/([a-z])([A-Z])/)) {
-              label = label.replace(/([a-z])([A-Z])/g, "$1 $2");
-            }
-
-            return {
-              key: column,
-              label: label,
-            };
-          }),
-      };
-    });
   });
 </script>
 
 <svelte:window bind:innerWidth={width} bind:innerHeight={height} />
 
-{#if data.length}
-  <!-- <Balls {data}/> -->
-  <Globe {data} />
-{/if}
-
-<!-- <div class="app">
-  {#each sections as section}
-    <div class="section">
-      <div class="section__title">{section.name}</div>
-
-      <div class="graphics">
-        {#each section.columns as column}
-          <div class="graphic">
-            <div class="graphic__title">{column.label}</div>
-
-            <Bubbles {data} width="200" height="200" colorKey={column.key} />
-          </div>
-        {/each}
-      </div>
+<div class="controls">
+  {#each components as component}
+    <div
+      class="control {selectedComponent === component ? 'selected' : ''}"
+      on:click={() => (selectedComponent = component)}
+    >
+      {component.name}
     </div>
   {/each}
-</div> -->
+</div>
+
+{#if data.length && selectedComponent}
+  <svelte:component this={selectedComponent.component} {data} />
+{/if}
 
 <style>
   @import url("./css/main.css");
 
-  .app {
-    letter-spacing: -0.02rem;
+  .controls {
+    position: fixed;
+    right: 0;
+    bottom: 2rem;
+    left: 0;
 
-    font-family: system-ui, sans-serif;
-  }
-
-  .section {
-    max-width: 80rem;
-    margin: 0 auto 6rem auto;
-
-    padding: 2rem 0;
-  }
-
-  .section__title {
-    font-weight: 600;
-    font-size: 2rem;
-    margin: 0 0 1rem 0;
-  }
-
-  .graphics {
     display: flex;
 
-    padding: 1rem 0;
+    width: fit-content;
+    margin: auto;
 
-    gap: 2rem;
+    padding: 0.25rem;
 
-    flex-wrap: wrap;
+    border-radius: 2rem;
+    background: #fff;
   }
 
-  .graphic {
-    flex-basis: 1;
+  .control {
+    padding: 0.75rem 2rem;
+
+    cursor: pointer;
+
+    border-radius: 2rem;
   }
 
-  .graphic__title {
-    border-top: 1px solid #ccc;
-    padding: 0.5rem 0 1rem 0;
+  .control.selected {
+    background: #000;
+    color: #fff;
   }
 </style>
