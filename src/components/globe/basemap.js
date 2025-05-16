@@ -98,7 +98,6 @@ export async function createBaseMap() {
   const texture = new THREE.CanvasTexture(canvas);
 
   // https://stackoverflow.com/questions/45376919/texture-on-sphere-fuzzy-after-version-upgrade
-  texture.mapping = THREE.EquirectangularReflectionMapping;
   texture.minFilter = THREE.NearestFilter;
 
   const geometry = new THREE.SphereGeometry(1, 64, 64);
@@ -110,7 +109,7 @@ export async function createBaseMap() {
   });
 
   const sphere = new THREE.Mesh(geometry, material);
-  sphere.rotation.x = Math.PI / 4;
+  // sphere.rotation.x = Math.PI / 4;
 
   return sphere;
 }
