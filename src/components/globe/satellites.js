@@ -1,8 +1,5 @@
 import * as THREE from "three";
 
-// Orbits are a group
-// Satellites are a group
-
 export class Satellites {
   constructor(portfolioData, options) {
     this.portfolioData = portfolioData;
@@ -37,6 +34,7 @@ export class Satellites {
 
     const orbitMaterial = new THREE.LineBasicMaterial({ color: 0x000000 });
 
+    // Contains all the orbit groups
     this.orbitsGroup = new THREE.Group();
 
     this.satellites = [];
@@ -49,7 +47,7 @@ export class Satellites {
       const geometry = new THREE.BufferGeometry().setFromPoints(points);
 
       const ellipse = new THREE.Line(geometry, orbitMaterial);
-      //   orbitGroup.add(ellipse);
+      // orbitGroup.add(ellipse);
 
       let xRotation = Math.random() * Math.PI;
       let yRotation = Math.random() * Math.PI;
@@ -72,8 +70,7 @@ export class Satellites {
       const point = orbit.getPoint(0);
 
       satellite.position.copy(point);
-      satellite.position.z = 0; // Set z to 0 to keep it on the orbit plane
-
+      satellite.position.z = 0;
       this.satellites.push(satellite);
 
       orbitGroup.add(satellite);
@@ -88,13 +85,12 @@ export class Satellites {
     this.satellites.forEach((satellite, index) => {
       let orbit = this.orbits[index % this.orbits.length];
 
-      // Get a value from 0 to 1 oscilliating with time
       let t = (Date.now() % 10_000) / 10_000;
 
       let point = orbit.getPoint(t);
 
       satellite.position.copy(point);
-      satellite.position.z = 0; // Set z to 0 to keep it on the orbit plane
+      satellite.position.z = 0;
     });
   }
 }
