@@ -3,13 +3,11 @@
 
   import * as d3 from "d3";
   import * as THREE from "three";
-  import * as topojson from "topojson-client";
 
   import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 
-  import { getGeoData } from "../../data/getData.js";
-
   import { createBaseMap } from "./baseMap.js";
+  import { initialize } from "./initialize.js";
 
   let container = null;
 
@@ -18,6 +16,7 @@
   let portfolioData = data;
 
   onMount(async () => {
+    /*
     const width = window.innerWidth;
     const height = window.innerHeight;
 
@@ -43,9 +42,14 @@
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
     scene.add(ambientLight);
 
-    const sphere = await createBaseMap();
+    */
+
+    let { scene, camera, renderer, controls } = initialize(container);
+
     const group = new THREE.Group();
-    group.add(sphere);
+
+    const map = await createBaseMap();
+    group.add(map);
 
     scene.add(group);
 
@@ -128,6 +132,8 @@
       orbitGroup.add(satellite);
     });
 
+    // Flow below this line...
+
     let randomPointOnSphere = (radius) => {
       const theta = Math.random() * Math.PI * 2;
       const phi = Math.acos(2 * Math.random() - 1); // Uniform distribution
@@ -184,6 +190,7 @@
 
     function animate() {
       requestAnimationFrame(animate);
+
       controls.update();
       renderer.render(scene, camera);
 
