@@ -5,6 +5,15 @@
   import * as THREE from "three";
   import * as topojson from "topojson-client";
 
+  import {
+    ToonShader1,
+    ToonShader2,
+    ToonShaderHatching,
+    ToonShaderDotted,
+  } from "three/addons/shaders/ToonShader.js";
+
+  import { ShaderMaterial } from "three";
+
   import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 
   let container = null;
@@ -48,11 +57,23 @@
       emissiveIntensity: 0.5,
     });
 
+    const dottedMaterial = createShaderMaterial(
+      ToonShaderDotted,
+      light,
+      ambientLight
+    );
+
+    const hatchingMaterial = createShaderMaterial(
+      ToonShaderHatching,
+      light,
+      ambientLight
+    );
+
     data.forEach((d) => {
       const geometry = new THREE.SphereGeometry(0.1, 32, 32);
       // const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
 
-      const sphere = new THREE.Mesh(geometry, material);
+      const sphere = new THREE.Mesh(geometry, hatchingMaterial);
 
       // Scale the sphere
 
@@ -71,6 +92,26 @@
       requestAnimationFrame(animate);
       controls.update();
       renderer.render(scene, camera);
+    }
+
+    function createShaderMaterial(shader, light, ambientLight) {
+      const u = THREE.UniformsUtils.clone(shader.uniforms);
+
+      const vs = shader.vertexShader;
+      const fs = shader.fragmentShader;
+
+      const material = new THREE.ShaderMaterial({
+        uniforms: u,
+        vertexShader: vs,
+        fragmentShader: fs,
+      });
+
+      material.uniforms["uDirLightPos"].value = light.position;
+      material.uniforms["uDirLightColor"].value = light.color;
+
+      material.uniforms["uAmbientLightColor"].value = ambientLight.color;
+
+      return material;
     }
 
     animate();

@@ -124,7 +124,8 @@
 
       satellites.push(satellite);
 
-      // orbitGroup.add(satellite);
+      //
+      orbitGroup.add(satellite);
     });
 
     let randomPointOnSphere = (radius) => {
@@ -150,7 +151,7 @@
       let sphere = pointMesh.clone();
       sphere.position.copy(point);
 
-      group.add(sphere);
+      // group.add(sphere);
     });
 
     // Add random particles that animate towards the closest point on the sphere
@@ -179,7 +180,7 @@
       particleTargets.push(pos);
     }
 
-    group.add(instancedParticles);
+    // group.add(instancedParticles);
 
     function animate() {
       requestAnimationFrame(animate);
