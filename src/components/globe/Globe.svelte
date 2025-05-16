@@ -7,7 +7,9 @@
   import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 
   import { createBaseMap } from "./baseMap.js";
+
   import { initialize } from "./initialize.js";
+  import { Satellites } from "./satellites.js";
 
   let container = null;
 
@@ -48,11 +50,22 @@
 
     const group = new THREE.Group();
 
-    const map = await createBaseMap();
+    const map = await createBaseMap(); // Convert map to a class...
     group.add(map);
 
     scene.add(group);
 
+    const satellites = new Satellites(portfolioData, {
+      showObits: true,
+    });
+
+    group.add(satellites.orbitsGroup);
+
+    let satellitesGroup = satellites;
+
+    console.log("Satellites", satellites);
+
+    /*
     // Add orbits and satellites
     const satelliteGeometry = new THREE.SphereGeometry(0.03, 32, 32);
     // const satelliteMaterial = new THREE.MeshBasicMaterial({ color: 0xf8dc5d });
@@ -132,8 +145,11 @@
       orbitGroup.add(satellite);
     });
 
+    */
+
     // Flow below this line...
 
+    /*
     let randomPointOnSphere = (radius) => {
       const theta = Math.random() * Math.PI * 2;
       const phi = Math.acos(2 * Math.random() - 1); // Uniform distribution
@@ -188,6 +204,8 @@
 
     // group.add(instancedParticles);
 
+    */
+
     function animate() {
       requestAnimationFrame(animate);
 
@@ -196,9 +214,12 @@
 
       group.rotation.y += 0.001;
 
+      satellites.animate();
+
       // Update canvas texture
       // texture.needsUpdate = true;
 
+      /*
       satellites.forEach((satellite, index) => {
         let orbit = orbits[index % orbits.length];
 
@@ -210,7 +231,9 @@
         satellite.position.copy(point);
         satellite.position.z = 0; // Set z to 0 to keep it on the orbit plane
       });
+      */
 
+      /*
       // Animate instanced particles towards their closest random point on the sphere
       for (let i = 0; i < particleCount; i++) {
         let pos = particleTargets[i];
@@ -240,6 +263,8 @@
       }
 
       instancedParticles.instanceMatrix.needsUpdate = true;
+
+      */
     }
 
     animate();
