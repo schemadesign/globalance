@@ -89,7 +89,7 @@ export async function createBaseMap() {
     context.fill();
 
     context.lineWidth = 4;
-    context.strokeStyle = "#fff";
+    context.strokeStyle = "#222";
     context.stroke();
     context.closePath();
   });
@@ -98,6 +98,7 @@ export async function createBaseMap() {
   const texture = new THREE.CanvasTexture(canvas);
 
   // https://stackoverflow.com/questions/45376919/texture-on-sphere-fuzzy-after-version-upgrade
+  texture.mapping = THREE.EquirectangularReflectionMapping;
   texture.minFilter = THREE.NearestFilter;
 
   const geometry = new THREE.SphereGeometry(1, 64, 64);
