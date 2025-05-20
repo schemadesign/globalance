@@ -35,7 +35,7 @@ export class Rods {
     this.particlePositions = [];
     this.particleTargets = [];
 
-    const heightScale = d3.scaleLinear().domain([0.25, 0.75]).range([1, 10]);
+    const heightScale = d3.scaleLinear().domain([0, 0.75]).range([1, 10]);
 
     for (let i = 0; i < distributedPoints.length; i++) {
       let country = distributedPoints[i].country;
@@ -44,7 +44,13 @@ export class Rods {
 
       const lat = THREE.MathUtils.degToRad(coordinates[1]);
       const lon = THREE.MathUtils.degToRad(coordinates[0]);
-      const radius = 1.025; // Adjusted radius for the globe
+      const baseRadius = 1.0; // Sphere radius
+      const height = heightScale(value);
+
+      // The rod should start at the sphere surface and extend outward by half its height
+      // Since the box is centered, move it out by (baseRadius + (height * 0.005) / 2)
+      const rodLength = height * 0.005;
+      const radius = baseRadius + rodLength / 2;
 
       const x = radius * Math.cos(lat) * Math.sin(lon);
       const y = radius * Math.sin(lat);
@@ -53,7 +59,6 @@ export class Rods {
       const pos = new THREE.Vector3(x, y, z);
 
       // Scale the height based on the value
-      const height = heightScale(value);
       const scale = new THREE.Vector3(1, height, 1); // Scale the rod in the Y direction
 
       // Compute the direction from the center to the point (the normal)

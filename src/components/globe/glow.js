@@ -1,7 +1,5 @@
 import * as THREE from "three";
 
-const sphereGeometry = new THREE.SphereGeometry(1, 64, 64);
-
 const vs_glow = `
   uniform float c;
   uniform float p;
@@ -43,5 +41,18 @@ export const glowMaterial = new THREE.ShaderMaterial({
   depthWrite: false,
 });
 
-const sphere = new THREE.Mesh(sphereGeometry, glowMaterial);
-sphere.position.set(0, 0, 0);
+export function getGlowMaterial(color) {
+  return new THREE.ShaderMaterial({
+    uniforms: {
+      c: { value: 1 },
+      p: { value: 2 },
+      glowColor: { value: color },
+    },
+
+    vertexShader: vs_glow,
+    fragmentShader: fs_glow,
+
+    transparent: true,
+    depthWrite: false,
+  });
+}
