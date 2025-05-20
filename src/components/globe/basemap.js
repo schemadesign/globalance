@@ -70,6 +70,25 @@ export async function createBaseMap() {
 
   const path = d3.geoPath(null, context).projection(projection);
 
+  // Create circle grid pattern
+  const patternCanvas = document.createElement("canvas");
+  const patternContext = patternCanvas.getContext("2d");
+  const patternSize = 32;
+  patternCanvas.width = patternSize;
+  patternCanvas.height = patternSize;
+  patternContext.fillStyle = "#fff";
+  // patternContext.fillRect(0, 0, patternSize, patternSize);
+  patternContext.fillStyle = "#fff";
+  patternContext.beginPath();
+  patternContext.arc(
+    patternSize / 2,
+    patternSize / 2,
+    patternSize / 4,
+    0,
+    Math.PI * 2
+  );
+  patternContext.fill();
+
   features.forEach((feature) => {
     let id = feature.properties.two;
 
@@ -79,10 +98,17 @@ export async function createBaseMap() {
 
     let dataPoint = data[id];
 
+    // Fill with dot pattern of the data color
+
     if (dataPoint) {
       context.fillStyle = colorScale(dataPoint["footprint"]);
+      context.fill();
+
+      // context.fillStyle = context.createPattern(patternCanvas, "repeat");
+      // context.fill();
     } else {
       context.fillStyle = "white";
+      context.fill();
     }
 
     // context.fillStyle = "black";

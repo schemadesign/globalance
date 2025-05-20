@@ -7,8 +7,8 @@ export class Satellites {
     this.satelliteGeometry = new THREE.SphereGeometry(0.03, 32, 32);
 
     this.satelliteMaterial = new THREE.MeshStandardMaterial({
-      color: 0xf8dc5d,
-      emissive: 0xf8dc5d,
+      color: 0xcccccc,
+      emissive: 0xcccccc,
       emissiveIntensity: 0.5,
       opacity: 1,
     });

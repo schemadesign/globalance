@@ -33,12 +33,14 @@
     const flow = new Flow(10000);
 
     group.add(map);
-    // group.add(satellites.orbitsGroup);
-    group.add(flow.instancedParticles);
+    group.add(satellites.orbitsGroup);
+    // group.add(flow.instancedParticles);
 
     flow.randomPointSpheres.forEach((sphere) => {
       group.add(sphere);
     });
+
+    // Add a sphere with a shader material that is has a graident from magenta to transparent
 
     function animate() {
       controls.update();
