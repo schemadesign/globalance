@@ -37,7 +37,7 @@
 
     // group.add(map);
     // group.add(satellites.orbitsGroup);
-    // group.add(flow.instancedParticles);
+    group.add(flow.instancedParticles);
 
     /*
     flow.randomPointSpheres.forEach((sphere) => {
@@ -46,7 +46,7 @@
     */
 
     // Add white sphere
-    const sphereGeometry = new THREE.SphereGeometry(1, 128, 128);
+    const sphereGeometry = new THREE.SphereGeometry(1, 128, 128); 
     const sphereMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff });
     const sphere = new THREE.Mesh(sphereGeometry, getGlowMaterial(new THREE.Color(0x45909B)));
     sphere.position.set(0, 0, 0);
@@ -55,7 +55,7 @@
     let rods = new Rods();
     await rods.setup();
 
-    group.add(rods.instancedParticles);
+    // group.add(rods.instancedParticles);
 
     // group.add(rods.group);
 

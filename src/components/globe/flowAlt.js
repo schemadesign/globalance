@@ -1,7 +1,7 @@
 import * as THREE from "three";
 
 export class Flow {
-  constructor(particleCount = 10_000) {
+  constructor(particleCount = 10000) {
     this.particleCount = particleCount;
 
     this.randomPointOnSphere = (radius) => {
@@ -32,33 +32,33 @@ export class Flow {
     // Particles
     // let particleGeometry = new THREE.SphereGeometry(0.005, 16, 16);
     // Make particle a small box
-    let particleGeometry = new THREE.BoxGeometry(0.0025, 0.1, 0.0025);
+    let particleGeometry = new THREE.BoxGeometry(0.005, 0.05, 0.005);
     let particleMaterial = new THREE.ShaderMaterial({
       vertexShader: `
-        varying vec3 vLocalPosition;
+    varying vec3 vWorldPosition;
 
-        void main() {
-          vLocalPosition = position;
-          vec4 worldPosition = modelMatrix * instanceMatrix * vec4(position, 1.0);
-          gl_Position = projectionMatrix * viewMatrix * worldPosition;
-        }
-      `,
+    void main() {
+      vec4 worldPosition = modelMatrix * instanceMatrix * vec4(position, 1.0);
+      vWorldPosition = worldPosition.xyz;
+      gl_Position = projectionMatrix * viewMatrix * worldPosition;
+    }
+  `,
       fragmentShader: `
-        uniform vec3 colorStart;
-        uniform vec3 colorEnd;
-        uniform float gradientHeight;
-        varying vec3 vLocalPosition;
+    uniform vec3 colorStart;
+    uniform vec3 colorEnd;
+    uniform float gradientHeight;
+    varying vec3 vWorldPosition;
 
-        void main() {
-          float t = clamp((vLocalPosition.y + gradientHeight * 0.5) / gradientHeight, 0.0, 1.0);
-          vec3 color = mix(colorStart, colorEnd, t);
-          gl_FragColor = vec4(color, 1.0);
-        }
-      `,
+    void main() {
+      float t = clamp((vWorldPosition.y + gradientHeight * 0.5) / gradientHeight, 0.0, 1.0);
+      vec3 color = mix(colorStart, colorEnd, t);
+      gl_FragColor = vec4(color, 1.0);
+    }
+  `,
       uniforms: {
-        colorStart: { value: new THREE.Color(0x45909b) },
-        colorEnd: { value: new THREE.Color(0xf8dc5d) },
-        gradientHeight: { value: 0.05 },
+        colorStart: { value: new THREE.Color(0xf8dc5d) }, // light yellow
+        colorEnd: { value: new THREE.Color(0xff3c38) }, // reddish
+        gradientHeight: { value: 2.0 }, // tweak this to cover the Y range of your scene
       },
     });
 
