@@ -37,9 +37,18 @@
     // group.add(satellites.orbitsGroup);
     // group.add(flow.instancedParticles);
 
+    /*
     flow.randomPointSpheres.forEach((sphere) => {
       group.add(sphere);
     });
+    */
+
+    // Add white sphere
+    const sphereGeometry = new THREE.SphereGeometry(1, 64, 64);
+    const sphereMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff });
+    const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+    sphere.position.set(0, 0, 0);
+    group.add(sphere);
 
     let rods = new Rods();
     await rods.setup();
