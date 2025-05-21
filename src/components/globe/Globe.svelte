@@ -35,8 +35,8 @@
 
     const flow = new Flow(10000);
 
-    // group.add(map);
-    // group.add(satellites.orbitsGroup);
+    group.add(map);
+    group.add(satellites.orbitsGroup);
     group.add(flow.instancedParticles);
 
     /*
@@ -46,18 +46,19 @@
     */
 
     // Add white sphere
-    const sphereGeometry = new THREE.SphereGeometry(1, 128, 128); 
+    const sphereGeometry = new THREE.SphereGeometry(1, 128, 128);
     const sphereMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff });
-    const sphere = new THREE.Mesh(sphereGeometry, getGlowMaterial(new THREE.Color(0x45909B)));
+    const sphere = new THREE.Mesh(
+      sphereGeometry,
+      getGlowMaterial(new THREE.Color(0x45909b))
+    );
     sphere.position.set(0, 0, 0);
     scene.add(sphere);
 
     let rods = new Rods();
     await rods.setup();
 
-    // group.add(rods.instancedParticles);
-
-    // group.add(rods.group);
+    group.add(rods.instancedParticles);
 
     // Add a sphere with a shader material that is has a graident from magenta to transparent
 
@@ -68,7 +69,7 @@
       group.rotation.y += 0.001;
 
       flow.animate();
-      satellites.animate();
+      satellites.animate({ camera });
 
       requestAnimationFrame(animate);
     }

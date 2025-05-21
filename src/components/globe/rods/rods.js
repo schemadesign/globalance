@@ -35,12 +35,12 @@ export class Rods {
     this.particlePositions = [];
     this.particleTargets = [];
 
-    const heightScale = d3.scaleLinear().domain([0, 0.75]).range([1, 10]);
+    const heightScale = d3.scaleLinear().domain([0, 0.5]).range([1, 10]);
 
     for (let i = 0; i < distributedPoints.length; i++) {
       let country = distributedPoints[i].country;
       let coordinates = distributedPoints[i].coordinates;
-      let value = data[country]?.megatrend;
+      let value = data[country]?.footprint;
 
       const lat = THREE.MathUtils.degToRad(coordinates[1]);
       const lon = THREE.MathUtils.degToRad(coordinates[0]);

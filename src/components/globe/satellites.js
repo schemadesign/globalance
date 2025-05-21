@@ -1,5 +1,7 @@
 import * as THREE from "three";
 
+import { getGlowMaterial } from "./glow.js";
+
 export class Satellites {
   constructor(portfolioData, options) {
     this.portfolioData = portfolioData;
@@ -7,11 +9,13 @@ export class Satellites {
     this.satelliteGeometry = new THREE.SphereGeometry(0.03, 32, 32);
 
     this.satelliteMaterial = new THREE.MeshStandardMaterial({
-      color: 0x45909B,
-      emissive: 0x45909B,
+      color: 0x45909b,
+      emissive: 0x45909b,
       emissiveIntensity: 0.5,
       opacity: 1,
     });
+
+    // this.satelliteMaterial = getGlowMaterial(new THREE.Color(0x45909b));
 
     this.orbitMaterial = new THREE.LineBasicMaterial({ color: 0x000000 });
 
@@ -81,7 +85,9 @@ export class Satellites {
     return this;
   }
 
-  animate() {
+  animate(options = {}) {
+    let camera = options.camera || null;
+
     this.satellites.forEach((satellite, index) => {
       let orbit = this.orbits[index % this.orbits.length];
 
@@ -91,6 +97,14 @@ export class Satellites {
 
       satellite.position.copy(point);
       satellite.position.z = 0;
+
+      // Look at the camera
+
+      /*
+      if (camera) {
+        satellite.lookAt(camera.position);
+      }
+      */
     });
   }
 }

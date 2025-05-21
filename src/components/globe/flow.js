@@ -15,7 +15,7 @@ export class Flow {
 
     this.randomPoints = new Array(10)
       .fill(0)
-      .map(() => this.randomPointOnSphere(1.025));
+      .map(() => this.randomPointOnSphere(1.001));
 
     // Attractor
     let pointGeometry = new THREE.SphereGeometry(0.02, 32, 32);
@@ -57,7 +57,8 @@ export class Flow {
       `,
       uniforms: {
         colorStart: { value: new THREE.Color(0x45909b) },
-        colorEnd: { value: new THREE.Color(0xf8dc5d) },
+        // colorEnd: { value: new THREE.Color(0xf8dc5d) },
+        colorEnd: { value: new THREE.Color(0xffffff) },
         gradientHeight: { value: 0.05 },
       },
     });
@@ -73,7 +74,7 @@ export class Flow {
     this.particlePositions = [];
 
     for (let i = 0; i < this.particleCount; i++) {
-      const pos = this.randomPointOnSphere(1.025);
+      const pos = this.randomPointOnSphere(1.001);
       const matrix = new THREE.Matrix4().setPosition(pos);
 
       this.instancedParticles.setMatrixAt(i, matrix);
@@ -98,7 +99,7 @@ export class Flow {
 
       // If close to attractor, pick a new random target
       if (pos.distanceTo(closestPoint) < 0.01) {
-        pos = this.randomPointOnSphere(1.025);
+        pos = this.randomPointOnSphere(1.001);
         // this.particleTargets[i] = pos;
         // direction = pos.clone().normalize(); // fallback direction
       }
@@ -108,7 +109,7 @@ export class Flow {
         .clone()
         .add(direction.clone().multiplyScalar(0.001));
       let newDirection = newPosition.clone().normalize();
-      let newPoint = newDirection.multiplyScalar(1.025);
+      let newPoint = newDirection.multiplyScalar(1.001);
 
       direction = newPoint.clone().sub(pos).normalize(); // update direction of travel
       pos = newPoint;

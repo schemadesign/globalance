@@ -9,8 +9,9 @@ export async function createBaseMap() {
 
   const colorScale = d3
     .scaleLinear()
-    .domain([0, 0.5])
-    .range(["#8CB2B9", "#4A4886"]);
+    .domain([0, 1])
+    .range(["#fff", "#45909B"])
+    .clamp(true);
 
   let codes = await fetch("/geo/codes.csv")
     .then((response) => response.text())
@@ -32,7 +33,7 @@ export async function createBaseMap() {
     })
     .then((features) => {
       return features.map((feature) => {
-        let code = codes[feature.id];
+        let code = codes[Number(feature.id)];
 
         if (code) {
           feature.properties = {
@@ -98,6 +99,8 @@ export async function createBaseMap() {
 
     let dataPoint = data[id];
 
+    console.log("dataPoint", dataPoint?.footprint);
+
     // Fill with dot pattern of the data color
 
     if (dataPoint) {
@@ -126,7 +129,7 @@ export async function createBaseMap() {
   // https://stackoverflow.com/questions/45376919/texture-on-sphere-fuzzy-after-version-upgrade
   texture.minFilter = THREE.NearestFilter;
 
-  const geometry = new THREE.SphereGeometry(1, 64, 64);
+  const geometry = new THREE.SphereGeometry(0.999, 64, 64);
   // const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
 
   const material = new THREE.MeshBasicMaterial({
@@ -135,7 +138,7 @@ export async function createBaseMap() {
   });
 
   const sphere = new THREE.Mesh(geometry, material);
-  // sphere.rotation.x = Math.PI / 4;
+  sphere.rotation.y = -Math.PI / 2;
 
   return sphere;
 }
