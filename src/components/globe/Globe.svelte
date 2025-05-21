@@ -12,6 +12,7 @@
   import { Satellites } from "./satellites.js";
   import { Flow } from "./flow.js";
   import { Rods } from "./rods/rods.js";
+  import { Pyramids } from "./pyramids.js";
 
   import { getGlowMaterial, glowMaterial } from "./glow.js";
 
@@ -24,28 +25,14 @@
   onMount(async () => {
     let { scene, camera, renderer, controls } = initialize(container);
 
+    // All the elements will be added to this group
     const group = new THREE.Group();
     scene.add(group);
 
     const map = await createBaseMap(); // Convert map to a class...
-
-    const satellites = new Satellites(portfolioData, {
-      showObits: true,
-    });
-
-    const flow = new Flow(10000);
-
     group.add(map);
-    group.add(satellites.orbitsGroup);
-    group.add(flow.instancedParticles);
 
-    /*
-    flow.randomPointSpheres.forEach((sphere) => {
-      group.add(sphere);
-    });
-    */
-
-    // Add white sphere
+    // Gradient sphere
     const sphereGeometry = new THREE.SphereGeometry(1, 128, 128);
     const sphereMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff });
     const sphere = new THREE.Mesh(
@@ -55,12 +42,27 @@
     sphere.position.set(0, 0, 0);
     scene.add(sphere);
 
+    // Satellites
+    const satellites = new Satellites(portfolioData, {
+      showObits: true,
+    });
+    // group.add(satellites.orbitsGroup);
+
+    // Flow
+    const flow = new Flow(10000);
+    // group.add(flow.instancedParticles);
+
+    // Rods
     let rods = new Rods();
     await rods.setup();
+    // group.add(rods.instancedParticles);
 
-    group.add(rods.instancedParticles);
+    // Pyramids
+    let pyramids = new Pyramids();
+    await pyramids.setup();
+    group.add(pyramids.pyramids);
 
-    // Add a sphere with a shader material that is has a graident from magenta to transparent
+    console.log(pyramids.pyramids);
 
     function animate() {
       controls.update();

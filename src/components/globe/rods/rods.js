@@ -7,14 +7,12 @@ import { getGeoData } from "../../../data/getData.js";
 
 export class Rods {
   constructor() {
-    this.setup();
-
-    let group = new THREE.Group();
-
     return this;
   }
 
   async setup() {
+    console.log("setup rods");
+
     let data = await getGeoData();
 
     let distributedPoints = await getFibonacciDotsWithCountry();

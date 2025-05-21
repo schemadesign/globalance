@@ -49,8 +49,6 @@ export async function createBaseMap() {
   const canvasWidth = 1024 * 16;
   const canvasHeight = canvasWidth / 2;
 
-  console.log("canvas size", canvasWidth, canvasHeight);
-
   const projection = d3
     .geoEquirectangular()
     .translate([canvasWidth / 2, canvasHeight / 2])
@@ -98,8 +96,6 @@ export async function createBaseMap() {
     path(feature);
 
     let dataPoint = data[id];
-
-    console.log("dataPoint", dataPoint?.footprint);
 
     // Fill with dot pattern of the data color
 
