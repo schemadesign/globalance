@@ -59,20 +59,29 @@ export class Pyramids {
 
     // Add pyramids geometry for each point
 
-    let pyramidGeometry = new THREE.ConeGeometry(0.025, 0.25, 4);
+    let pyramidGeometry = new THREE.ConeGeometry(0.01, 0.25, 4);
     let pyramidMaterial = new THREE.MeshStandardMaterial({
       color: 0x45909b,
+      transparent: true,
+      opacity: 0.2,
     });
 
     centroids.forEach((element) => {
-      let country = element.country;
       let coordinates = element.coordinates;
-      let value = data[country]?.footprint;
+      let value = data[element.two]?.footprint;
+
+      if (!value) {
+        return;
+      }
+
+      let height = value * 0.25;
+
+      let pyramidGeometry = new THREE.ConeGeometry(0.05, height, 32);
 
       const lat = THREE.MathUtils.degToRad(coordinates[1]);
       const lon = THREE.MathUtils.degToRad(coordinates[0]);
       const baseRadius = 1.0; // Sphere radius
-      const height = 0.25; // Pyramid height (matches geometry)
+      // const height = 0.25; // Pyramid height (matches geometry)
 
       // Calculate position on sphere surface
       const x = baseRadius * Math.cos(lat) * Math.sin(lon);
