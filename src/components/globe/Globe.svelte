@@ -14,7 +14,8 @@
   import { Flow } from "./flow.js";
   import { Rods } from "./rods/rods.js";
   import { Pyramids } from "./pyramids.js";
-  import { Bump } from "./displacement.js";
+  // import { Bump } from "./displacement.js";
+  import { Bump } from "./displacementInverse.js";
 
   import { getGlowMaterial, glowMaterial } from "./glow.js";
 
