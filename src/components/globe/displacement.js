@@ -64,7 +64,11 @@ export class Bump {
     let positions = sphereGeometry.attributes.position;
     let vertex = new THREE.Vector3();
 
-    let heightScale = d3.scaleLinear().domain([0, 1]).range([0.5, 0]);
+    let heightScale = d3
+      .scaleLinear()
+      .domain([0.05, .5])
+      .range([0.5, 0])
+      .clamp(true);
 
     // Displace each vertex outward based on distance to closest centroid
     for (let i = 0; i < positions.count; i++) {
@@ -113,7 +117,7 @@ export class Bump {
     // Create a material for the mesh
     let meshMaterial = new THREE.MeshStandardMaterial({
       color: 0x45909b,
-      transparent: true,
+      // transparent: true,
       wireframe: true,
     });
 
@@ -147,7 +151,7 @@ export class Bump {
       // Position box outward from sphere surface by 'height'
       box.position.set(x, y, z);
 
-      this.group.add(box);
+      // this.group.add(box);
     });
 
     return this;
