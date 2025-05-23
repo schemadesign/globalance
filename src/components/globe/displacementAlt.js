@@ -55,31 +55,47 @@ export class Bump {
 
     console.log(centroids);
 
-    // Create a sphere geometry and set the height of the points depending on how far they are from the closest centroid.
-    // We'll create a displaced sphere mesh instead of boxes.
+    // Create a sphere geometry and set the height of the points depending on how far they are from the closest centroid. The closer to a point the higher the point
+    // Parameters for boxes
+    const boxSize = 0.02;
+    const boxGeometry = new THREE.BoxGeometry(boxSize, boxSize, boxSize);
 
+    // Group to hold all boxes
     this.group = new THREE.Group();
-
-    let sphereGeometry = new THREE.SphereGeometry(1, 128, 128);
-    let positions = sphereGeometry.attributes.position;
-    let vertex = new THREE.Vector3();
 
     let heightScale = d3.scaleLinear().domain([0, 1]).range([0.5, 0]);
 
-    // Displace each vertex outward based on distance to closest centroid
-    for (let i = 0; i < positions.count; i++) {
-      vertex.fromBufferAttribute(positions, i);
+    // Create box material
+    let boxMaterial = new THREE.MeshStandardMaterial({
+      color: 0x45909b,
+      transparent: true,
+      opacity: 0.5,
+    });
+
+    // For each vertex on the sphere, place a box
+    let sphereGeometry = new THREE.SphereGeometry(1, 128, 128);
+    let positions = sphereGeometry.attributes.position.array;
+
+    for (let i = 0; i < positions.length; i += 3) {
+      let x = positions[i];
+      let y = positions[i + 1];
+      let z = positions[i + 2];
 
       // Convert cartesian to spherical coordinates (radians)
-      let radius = vertex.length();
-      let lat = Math.asin(vertex.y / radius);
-      let lon = Math.atan2(vertex.x, vertex.z);
+      // Use the same convention as for centroids
+      let radius = Math.sqrt(x * x + y * y + z * z);
+
+      let lat = Math.asin(y / radius); // radians
+      let lon = Math.atan2(x, z); // radians, matches centroid conversion
 
       // Find closest centroid using spherical (great-circle) distance
       let closestCentroid = centroids.reduce(
         (acc, centroid) => {
+          // centroid.coordinates: [lon, lat] in degrees
           let centroidLat = THREE.MathUtils.degToRad(centroid.coordinates[1]);
           let centroidLon = THREE.MathUtils.degToRad(centroid.coordinates[0]);
+
+          // Haversine formula for spherical distance (on unit sphere)
           let dLat = lat - centroidLat;
           let dLon = lon - centroidLon;
           let a =
@@ -88,38 +104,41 @@ export class Bump {
               Math.cos(centroidLat) *
               Math.sin(dLon / 2) *
               Math.sin(dLon / 2);
+
           let c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-          let distance = c;
+
+          let distance = c; // On unit sphere, so c is the distance
+
           if (distance < acc.distance) {
-            return { distance: distance, centroid: centroid };
+            return {
+              distance: distance,
+              centroid: centroid,
+            };
           }
           return acc;
         },
         { distance: Infinity }
       );
 
+      // Color and height
       let height = heightScale(closestCentroid.distance);
 
-      // Displace vertex outward
-      vertex.multiplyScalar(1 + height);
+      // Create box mesh
+      let box = new THREE.Mesh(boxGeometry, boxMaterial);
 
-      // Update position
-      positions.setXYZ(i, vertex.x, vertex.y, vertex.z);
+      // Position box outward from sphere surface by 'height'
+      let norm = Math.sqrt(x * x + y * y + z * z);
+      let nx = x / norm;
+      let ny = y / norm;
+      let nz = z / norm;
+
+      box.position.set(nx * (1 + height), ny * (1 + height), nz * (1 + height));
+
+      // Orient box so its "up" is away from sphere center
+      box.lookAt(0, 0, 0);
+
+      this.group.add(box);
     }
-
-    // Need to update the normals after modifying positions
-    sphereGeometry.computeVertexNormals();
-
-    // Create a material for the mesh
-    let meshMaterial = new THREE.MeshStandardMaterial({
-      color: 0x45909b,
-      transparent: true,
-      wireframe: true,
-    });
-
-    // Create the mesh and add to group
-    let displacedMesh = new THREE.Mesh(sphereGeometry, meshMaterial);
-    this.group.add(displacedMesh);
 
     // For each centroid, add a red box to the centroid position on the sphere
 
