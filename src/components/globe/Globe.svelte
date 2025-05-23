@@ -7,13 +7,14 @@
   import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 
   import { createBaseMap } from "./baseMap.js";
+  // import { createBaseMap } from "./createBasemapBlur.js";
 
   import { initialize } from "./initialize.js";
   import { Satellites } from "./satellites.js";
   import { Flow } from "./flow.js";
   import { Rods } from "./rods/rods.js";
   import { Pyramids } from "./pyramids.js";
-  import { Bump } from "./bump.js";
+  import { Bump } from "./displacement.js";
 
   import { getGlowMaterial, glowMaterial } from "./glow.js";
 
@@ -31,7 +32,7 @@
     scene.add(group);
 
     const map = await createBaseMap(); // Convert map to a class...
-    // group.add(map);
+    group.add(map);
 
     // Gradient sphere
     const sphereGeometry = new THREE.SphereGeometry(1, 128, 128);

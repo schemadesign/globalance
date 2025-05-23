@@ -42,7 +42,7 @@
 
 <svelte:window bind:innerWidth={width} bind:innerHeight={height} />
 
-<div class="controls">
+<!-- <div class="controls">
   {#each components as component}
     <div
       class="control {selectedComponent === component ? 'selected' : ''}"
@@ -51,7 +51,7 @@
       {component.name}
     </div>
   {/each}
-</div>
+</div> -->
 
 {#if data.length && selectedComponent}
   <svelte:component this={selectedComponent.component} {data} />
