@@ -59,7 +59,7 @@ export class Bump {
     // Group to hold all boxes
     this.group = new THREE.Group();
 
-    let heightScale = d3.scaleLinear().domain([0, 1]).range([0, 0.5]);
+    let heightScale = d3.scaleLinear().domain([0, 1]).range([0.5, 0]);
 
     // Create box material
     let boxMaterial = new THREE.MeshStandardMaterial({
@@ -69,7 +69,7 @@ export class Bump {
     });
 
     // For each vertex on the sphere, place a box
-    let sphereGeometry = new THREE.SphereGeometry(1, 32, 32);
+    let sphereGeometry = new THREE.SphereGeometry(1, 128, 128);
     let positions = sphereGeometry.attributes.position.array;
 
     for (let i = 0; i < positions.length; i += 3) {
@@ -78,17 +78,17 @@ export class Bump {
       let z = positions[i + 2];
 
       // Convert cartesian to spherical coordinates (radians)
-      let lat = Math.asin(y / Math.sqrt(x * x + y * y + z * z));
-      let lon = Math.atan2(z, x);
-
-      // console.log(lat, lon);
+      // Use the same convention as for centroids
+      let radius = Math.sqrt(x * x + y * y + z * z);
+      let lat = Math.asin(y / radius); // radians
+      let lon = Math.atan2(x, z); // radians, matches centroid conversion
 
       // Find closest centroid using spherical (great-circle) distance
       let closestCentroid = centroids.reduce(
         (acc, centroid) => {
           // centroid.coordinates: [lon, lat] in degrees
-          let centroidLat = (centroid.coordinates[1] * Math.PI) / 180;
-          let centroidLon = (centroid.coordinates[0] * Math.PI) / 180;
+          let centroidLat = THREE.MathUtils.degToRad(centroid.coordinates[1]);
+          let centroidLon = THREE.MathUtils.degToRad(centroid.coordinates[0]);
 
           // Haversine formula for spherical distance (on unit sphere)
           let dLat = lat - centroidLat;
@@ -115,11 +115,8 @@ export class Bump {
         { distance: Infinity }
       );
 
-      // console.log(closestCentroid.distance);
-
       // Color and height
       let height = heightScale(closestCentroid.distance);
-      // let height = 0;
 
       // Create box mesh
       let box = new THREE.Mesh(boxGeometry, boxMaterial);
